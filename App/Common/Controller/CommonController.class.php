@@ -630,11 +630,18 @@ class CommonController extends Controller
     }
 
     /**
-     * 添加自动验证规则
-     * @author 艾逗笔<765532665@qq.com>
+     * @param string $field
+     * @param string $rule
+     * @param string $error_tip
+     * @param string $condition
+     * @param string $extra_rule
+     * @param string $validate_time
+     * @return $this
+     * @author snkso.com
      */
-    public function addValidate($field, $rule, $error_tip, $condition, $extra_rule, $validate_time)
-    {
+    public function addValidate(
+        $field = '', $rule = '', $error_tip = '', $condition = '', $extra_rule = '', $validate_time = ''
+    ) {
         if (is_array($field)) {
             $this->model['validate'][] = $field;
         } else {
@@ -646,9 +653,14 @@ class CommonController extends Controller
 
     /**
      * 添加自动完成规则
-     * @author 艾逗笔<765532665@qq.com>
+     * @param string $field
+     * @param string $rule
+     * @param string $condition
+     * @param string $extra_rule
+     * @return $this
+     * @author snkso.com
      */
-    public function addAuto($field, $rule, $condition, $extra_rule)
+    public function addAuto($field = '', $rule = '', $condition = '', $extra_rule = '')
     {
         if (is_array($field)) {
             $this->model['auto'][] = $field;
@@ -767,7 +779,12 @@ class CommonController extends Controller
 
     /**
      * 添加显示项
-     * @author 艾逗笔<765532665@qq.com>
+     * @param string $name
+     * @param string $title
+     * @param string $format
+     * @param string $extra
+     * @return $this
+     * @author snkso.com
      */
     public function addListItem($name = '', $title = '', $format = '', $extra = '')
     {
@@ -853,9 +870,13 @@ class CommonController extends Controller
 
     /**
      * 添加子导航
-     * @author 艾逗笔<765532665@qq.com>
+     * @param string $title
+     * @param string $url
+     * @param string $class
+     * @return $this
+     * @author snkso.com
      */
-    public function addSubNav($title, $url, $class)
+    public function addSubNav($title = '', $url = '', $class = '')
     {
         if (is_array($title)) {
             $this->model['subnav'][] = $title;
