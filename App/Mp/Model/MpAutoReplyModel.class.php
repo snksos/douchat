@@ -20,7 +20,7 @@ class MpAutoReplyModel extends Model {
 		$tb_mp_rule = $db_prefix . 'mp_rule AS rule';
 		$sql = "SELECT reply.id AS reply_id,reply.reply_type AS reply_type,
 				material.id AS material_id,material.content AS content,
-				material.image AS image,
+				material.image AS image, material.media_id AS media_id,
 				material.title AS title,material.picurl AS picurl,material.description AS description,material.url AS url,
 				rule.id AS rule_id,rule.keyword AS keyword
 				FROM {$tb_mp_auto_reply} 
