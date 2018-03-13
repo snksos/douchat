@@ -612,6 +612,18 @@ function reply_music($arr)
 }
 
 /**
+ * 回复图片消息
+ * @param string $media_id
+ * @return bool|string
+ * @author snkso.com
+ */
+function reply_image($media_id = '')
+{
+    $wechatObj = get_wechat_obj();
+    return $wechatObj->image($media_id)->reply();
+}
+
+/**
  * 发送客服消息
  * @author 艾逗笔<765532665@qq.com>
  */
@@ -1031,5 +1043,5 @@ function get_material_thumb($media_id = null)
 {
     if (!$media_id)
         return '';
-    return M('mp_material')->where(array('media_id'=>$media_id))->getField('image');
+    return M('mp_material')->where(array('media_id' => $media_id))->getField('image');
 }

@@ -281,8 +281,9 @@ class MaterialController extends BaseController
             } else {
                 $material_id = $material_model->add($material);
             }
+            $news_data = [];
             foreach ($v['content']['news_item'] as $item) {
-                $news_data = [
+                $news_data[] = [
                     'material_id'        => $material_id,
                     'mpid'               => $mp_id,
                     'thumb_media_id'     => $item['thumb_media_id'],
@@ -295,10 +296,10 @@ class MaterialController extends BaseController
                     'show_cover_pic'     => $item['show_cover_pic'],
                     'url'                => $item['url']
                 ];
-                $where     = array('mpid' => $mp_id, 'material_id' => $material_id);
-                $news_model->where($where)->delete();   // 先删除，在添加
-                $news_model->add($news_data);
             }
+            $where     = array('mpid' => $mp_id, 'material_id' => $material_id);
+            $news_model->where($where)->delete();   // 先删除，在添加
+            $news_model->addAll($news_data);
         }
         $this->success('同步素材成功');
     }
