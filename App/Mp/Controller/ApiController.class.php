@@ -341,7 +341,7 @@ class ApiController extends Controller
                         add_score($this->mp_settings['fans_init_money'], '用户首次关注公众号', 'money', 'subscribe', 'system');
                     }
                 }
-                $this->redis->hSet('a','subscribe',json_encode($message));
+                $this->redis->hSet('a', 'subscribe', json_encode($message));
                 if ($this->message['EventKey'] && $this->message['Ticket']) {
                     $scene_qrcode = M('scene_qrcode')->where(array('mpid' => $this->mpid, 'ticket' => get_rev_ticket()))->find();
                     if ($scene_qrcode) {
@@ -356,6 +356,11 @@ class ApiController extends Controller
                         M('scene_qrcode_statistics')->add($scan_data);
                         $keyword = $scene_qrcode['keyword'];
                         $this->respond_keyword($keyword, $this->message);
+                    }
+                } else {
+                    $info = M('mp_auto_reply')->where(array('mpid' => $this->mpid, 'type' => 'subscribe'))->find();
+                    if ($info && $info['reply_type'] == 'keyword' && $info['keyword']) {
+                        $this->respond_keyword($info['keyword'], $this->message);
                     }
                 }
                 break;
