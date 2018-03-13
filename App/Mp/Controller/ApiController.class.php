@@ -18,6 +18,7 @@ class ApiController extends Controller
         'appid'          => '',
         'appsecret'      => ''
     );
+    protected $redis;
 
     /**
      * 公众号通信入口
@@ -25,8 +26,8 @@ class ApiController extends Controller
      */
     public function index($id)
     {
-        $redis = r_cache();
-        $redis->hSet('a', 'x', 'xxx');
+        $this->redis = r_cache();
+        $this->redis->hSet('a', 'x', 'xxx');
         if (empty($_GET['echostr']) && empty($_GET["signature"]) && empty ($_GET["nonce"])) {   // 禁止在浏览器直接打开接口
             echo 'Access denied';
             exit();
@@ -324,7 +325,8 @@ class ApiController extends Controller
     /**
      * 响应事件
      * @param $type 事件类型 subscribe/unsubscribe/scan/report_location/click/view
-     * @author 艾逗笔<765532665@qq.com>
+     * @param $message
+     * @author snkso.com
      */
     public function respond_event($type, $message)
     {
@@ -339,6 +341,7 @@ class ApiController extends Controller
                         add_score($this->mp_settings['fans_init_money'], '用户首次关注公众号', 'money', 'subscribe', 'system');
                     }
                 }
+                $this->redis->hSet('a','subscribe',json_encode($message));
                 if ($this->message['EventKey'] && $this->message['Ticket']) {
                     $scene_qrcode = M('scene_qrcode')->where(array('mpid' => $this->mpid, 'ticket' => get_rev_ticket()))->find();
                     if ($scene_qrcode) {
@@ -410,6 +413,3 @@ class ApiController extends Controller
         }
     }
 }
-
-
-?>
