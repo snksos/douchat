@@ -1,6 +1,6 @@
 ﻿## 产品介绍
 
-#### 豆信是一个专注于微信公众号开发的开源框架，具备“简洁、高效、优雅、易扩展”等特点。自主研发的插件扩展机制与视图构建工具能够帮助开发者快速实现微信端功能的开发。对微信接口进行了高度封装，能够轻松的处理微信端用户发送的文本、图片、语音、视频、位置、链接等类型消息，亦可对关注、取消关注、扫码、点击菜单、上报地理位置等事件进行灵活处理。
+#### 一个专注于微信公众号开发的开源框架，具备“简洁、高效、优雅、易扩展”等特点。自主研发的插件扩展机制与视图构建工具能够帮助开发者快速实现微信端功能的开发。对微信接口进行了高度封装，能够轻松的处理微信端用户发送的文本、图片、语音、视频、位置、链接等类型消息，亦可对关注、取消关注、扫码、点击菜单、上报地理位置等事件进行灵活处理。
 
 ## 产品特色
 
@@ -16,8 +16,3 @@
 #### 10、集成BUG反馈系统，产品保持高频次更新与迭代。
 
 ## 产品体验
-
-#### 豆信官网：<a href="http://douchat.cc/" target="_blank">http://douchat.cc/</a>
-#### 在线体验：<a href="http://demo.douchat.cc/" target="_blank">http://demo.douchat.cc/</a>
-#### 开发手册：<a href="http://doc.douchat.cc/" target="_blank">http://doc.douchat.cc/</a>
-#### 产品交流QQ群：<a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=41a33c33d92f00d63db24ae1490df68ade624d22488dfa8a832089fb8bbce576"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="豆信开源框架交流群" title="豆信开源框架交流群"></a>

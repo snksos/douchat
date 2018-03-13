@@ -23,6 +23,30 @@
 	.appmsg_action a{ width:50%; float:left; text-align:center; height:40px; line-height:40px; color:#444;}
 	.appmsg_action a:hover{ background:#ddd;}
     ul.img-list > img { width: 100px; height: 100px; float: left; margin: 5px }
+
+    .weui-desktop-appmsg__item {
+        padding: 12px 15px;
+        position: relative;
+    }
+    .weui-desktop-appmsg__thumb {
+        float: right;
+        margin-left: 12px;
+        width: 60px;
+        height: 60px;
+        background-size: cover;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        background-color: #F6F8F9;
+    }
+    .weui-desktop-appmsg__title {
+        overflow: hidden;
+        font-weight: 400;
+        word-wrap: break-word;
+        -webkit-hyphens: auto;
+        -ms-hyphens: auto;
+        hyphens: auto;
+        color: #353535;
+    }
 </style>
 </block>
 <block name="main_content">
@@ -46,23 +70,44 @@
             <form action="" method="post">
 	            <input type="hidden" id="action" name="action" value="del">
 	            <div class="table">
-	                <ul class="material_list">   
-	                    <volist name="lists" id="vo">     
-	                    <li class="appmsg_li"> 
+	                <ul class="material_list">
+	                    <volist name="lists" id="vo">
+	                    <li class="appmsg_li">
 	                    	<div class="appmsg_item">
-	                    		<h6 class="ellipsis">{$vo.title}</h6>
-                                <p class="title"></p>
-	                            <div class="main_img">
-	                                <a href="{:U('/news/'.$vo['id'])}" target="_blank"><img src="{$vo.picurl}"></a>
-	                            </div>
-	                            <p class="desc ellipsis">{$vo.description}</p>
-	                            <div class="appmsg_action">
-	                                <a href="{:U('edit',array('id'=>$vo['id']))}">编辑</a>
-	                                <a href="{:U('delete',array('id'=>$vo['id']))}" class="del_material">删除</a>
-	                            </div>
+                                <if condition="!empty($vo['news'])">
+                                    <volist name="vo['news']" id="news">
+                                        <if condition="$key==0">
+                                            <div class="main_img">
+                                                <a href="{$news.url}" target="_blank"><img src="{$news.thumb_url|default=''}"></a>
+                                            </div>
+                                            <a href="{$news.url}" target="_blank" class="weui-desktop-appmsg__title">
+                                                <p class="desc ellipsis">{$news.title|default=''}</p>
+                                            </a>
+                                           <else/>
+                                            <div class="weui-desktop-appmsg__item">
+                                                <i class="weui-desktop-appmsg__thumb" style="background-image: url({$news.thumb_media_id|get_material_thumb});"></i>
+                                                <a href="{$news.url}" target="_blank" class="weui-desktop-appmsg__title">{$news.title}</a>
+                                            </div>
+                                        </if>
+                                        <hr/>
+                                    </volist>
+
+                                    <else/>
+                                        <h6 class="ellipsis">{$vo.title}</h6>
+                                        <p class="title"></p>
+                                        <div class="main_img">
+                                            <a href="{:U('/news/'.$vo['id'])}" target="_blank"><img src="{$vo.picurl}"></a>
+                                        </div>
+                                        <p class="desc ellipsis">{$vo.description}</p>
+                                        <div class="appmsg_action">
+                                            <a href="{:U('edit',array('id'=>$vo['id']))}">编辑</a>
+                                            <a href="{:U('delete',array('id'=>$vo['id']))}" class="del_material ajax-post">删除</a>
+                                        </div>
+                                </if>
+
 	                        </div>
 	                    </li>
-	                    </volist>     	
+	                    </volist>
 	                </ul>
 	            </div>
             </form>

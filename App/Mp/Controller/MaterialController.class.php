@@ -30,7 +30,6 @@ class MaterialController extends BaseController
             ->addNav('图片素材', U('Material/image'), '')
             ->addNav('图文素材', U('Material/news'), '')
             ->addButton('添加文本素材', U('Material/add?type=text'), 'btn btn-primary')
-            ->addButton('获取文本素材', U('Material/pull', array('type' => 'text')), 'btn btn-primary ajax-post')
             ->assign('lists', $lists)
             ->assign('pagination', $pagination)
             ->display();
@@ -66,10 +65,16 @@ class MaterialController extends BaseController
      */
     public function news()
     {
-        $page       = max(1, intval(I('p')));
-        $count      = M('mp_material')->where(array('mpid' => get_mpid(), 'type' => 'news'))->count();
-        $per        = 50;
-        $lists      = M('mp_material')->where(array('mpid' => get_mpid(), 'type' => 'news'))->order('create_time desc')->page($page . ',' . $per)->select();
+        $page  = max(1, intval(I('p')));
+        $count = M('mp_material')->where(array('mpid' => get_mpid(), 'type' => 'news'))->count();
+        $per   = 50;
+        $lists = M('mp_material')->where(array('mpid' => get_mpid(), 'type' => 'news'))->order('create_time desc')->page($page . ',' . $per)->select();
+        foreach ($lists as &$item) {
+            if ($item['type'] === 'news' && $item['fromw'] === 'wechat') {
+                $news_list    = M('mp_news')->where(array('material_id' => $item['id']))->select();
+                $item['news'] = $news_list;
+            }
+        }
         $pagination = pagination($count, $per);
         $this->addCrumb('公众号管理', U('Index/index'), '')
             ->addCrumb('素材管理', U('Material/text'), '')
@@ -77,7 +82,8 @@ class MaterialController extends BaseController
             ->addNav('文本素材', U('Material/text'), '')
             ->addNav('图片素材', U('Material/image'), '')
             ->addNav('图文素材', '', 'active')
-            ->addButton('添加图文素材', U('Material/add?type=news'), 'btn btn-primary')
+            //            ->addButton('添加图文素材', U('Material/add?type=news'), 'btn btn-primary')
+            ->addButton('一键拉取图文素材', U('Material/pull?type=news'), 'btn btn-success', 'target="_blank"')
             ->assign('lists', $lists)
             ->assign('pagination', $pagination)
             ->display();
@@ -192,14 +198,7 @@ class MaterialController extends BaseController
      */
     public function download_image_from_wechat()
     {
-        $wechatInfo  = get_mp_info();
-        $options     = array(
-            'token'          => $wechatInfo['valid_token'],
-            'encodingaeskey' => $wechatInfo['encodingaeskey'],
-            'appid'          => $wechatInfo['appid'],
-            'appsecret'      => $wechatInfo['appsecret']
-        );
-        $wechatObj   = new Wechat($options);
+        $wechatObj   = $this->getWechatObj();
         $images      = $wechatObj->getForeverList('image', 0, 10);
         $upload_time = time();
         $upload_path = './Uploads/Pictures/' . date('Ymd', $upload_time) . '/';
@@ -242,7 +241,7 @@ class MaterialController extends BaseController
             $material['mpid']        = get_mpid();
             $material['type']        = 'image';
             $material['title']       = $file_name;
-            $material['image']       = get_host_url() . $file_path;
+            $material['image']       = 'http://' . C('HTTP_HOST') . trim($file_path, '.');
             $material['media_id']    = $v['media_id'];
             $material['fromw']       = 'wechat';
             $material['create_time'] = $create_time;
@@ -253,6 +252,73 @@ class MaterialController extends BaseController
             }
         }
         $this->success('同步素材成功');
+    }
+
+    /**
+     * 一键同步图文素材
+     * @author snkso.com
+     */
+    public function download_news_from_wechat()
+    {
+        $wechatObj = $this->getWechatObj();
+        $news      = $wechatObj->getForeverList('news', 0, 10);
+        // 先存放到mp material表 ， 再将详情存到mp news表
+        $mp_id          = get_mpid();
+        $material_model = M('mp_material');
+        $news_model     = M('mp_news');
+        foreach ($news['item'] as $k => $v) {
+            $material    = [
+                'mpid'        => $mp_id,
+                'type'        => 'news',
+                'fromw'       => 'wechat',
+                'create_time' => $v['update_time'],
+                'media_id'    => $v['media_id']
+            ];
+            $condition   = array('mpid' => $mp_id, 'type' => 'news', 'media_id' => $v['media_id']);
+            $material_id = $material_model->where($condition)->getField('id');
+            if ($material_id) {
+                $material_model->where($condition)->save($material);
+            } else {
+                $material_id = $material_model->add($material);
+            }
+            foreach ($v['content']['news_item'] as $item) {
+                $news_data = [
+                    'material_id'        => $material_id,
+                    'mpid'               => $mp_id,
+                    'thumb_media_id'     => $item['thumb_media_id'],
+                    'thumb_url'          => $item['thumb_url'],
+                    'title'              => $item['title'],
+                    'author'             => $item['author'],
+                    'digest'             => $item['digest'],
+                    'content'            => $item['content'],
+                    'content_source_url' => $item['content_source_url'],
+                    'show_cover_pic'     => $item['show_cover_pic'],
+                    'url'                => $item['url']
+                ];
+                $where     = array('mpid' => $mp_id, 'material_id' => $material_id);
+                $news_model->where($where)->delete();   // 先删除，在添加
+                $news_model->add($news_data);
+            }
+        }
+        $this->success('同步素材成功');
+    }
+
+    /**
+     * 获取微信SDK对象
+     * @return Wechat
+     * @author snkso.com
+     */
+    private function getWechatObj()
+    {
+        $wechatInfo = get_mp_info();
+        $options    = array(
+            'token'          => $wechatInfo['valid_token'],
+            'encodingaeskey' => $wechatInfo['encodingaeskey'],
+            'appid'          => $wechatInfo['appid'],
+            'appsecret'      => $wechatInfo['appsecret']
+        );
+        $wechatObj  = new Wechat($options);
+        return $wechatObj;
     }
 
     /**
@@ -412,12 +478,15 @@ class MaterialController extends BaseController
         // 素材的类型,图片（image）、视频（video）、语音 （voice）、图文（news）
         $type = I('type');
         if (!in_array($type,
-            [Wechat::MSGTYPE_TEXT, Wechat::MSGTYPE_IMAGE, Wechat::MSGTYPE_VOICE, Wechat::MSGTYPE_VIDEO])) {
+            [Wechat::MSGTYPE_NEWS, Wechat::MSGTYPE_IMAGE, Wechat::MSGTYPE_VOICE, Wechat::MSGTYPE_VIDEO])) {
             $this->error('请求不合法', null, true);
         }
         switch ($type) {
             case Wechat::MSGTYPE_IMAGE:
                 $this->download_image_from_wechat();
+                break;
+            case Wechat::MSGTYPE_NEWS:
+                $this->download_news_from_wechat();
                 break;
         }
     }

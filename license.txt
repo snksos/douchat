@@ -1,6 +1,6 @@
-豆信（douchat）遵循Apache2开源协议发布，并提供免费使用。
-版权所有Copyright © 2015-2016 豆信 (http://douchat.cc)
-豆信基于ThinkPHP开发。
+遵循Apache2开源协议发布，并提供免费使用。
+版权所有Copyright © 2015-2016
+基于ThinkPHP开发。
 
 
 ——————————————————————————
