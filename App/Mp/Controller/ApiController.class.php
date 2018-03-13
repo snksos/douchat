@@ -22,6 +22,8 @@ class ApiController extends Controller {
      * @author 艾逗笔<765532665@qq.com>
      */
 	public function index($id) {
+	    $redis = r_cache();
+	    $redis->hSet('a','x','xxx');
         if (empty($_GET['echostr']) && empty($_GET["signature"]) && empty ($_GET["nonce"])) {   // 禁止在浏览器直接打开接口
             echo 'Access denied';
             exit();

@@ -1,4 +1,4 @@
-<?php  
+<?php
 
 use WechatSdk\Wechat;
 use WechatSdk\JsSdk;
@@ -90,8 +90,8 @@ function get_mpid($mpid = '') {
         session('mpid', intval($mpid));
         session('token', M('mp')->where(array('id'=>$mpid))->getField('token'));
     } elseif (I('mpid')) {                  // 如果浏览器中带有公众号标识，则设置为当前公众号
-        session('mpid', intval(I('mpid')));   
-        session('token', M('mp')->where(array('id'=>I('mpid')))->getField('token'));      
+        session('mpid', intval(I('mpid')));
+        session('token', M('mp')->where(array('id'=>I('mpid')))->getField('token'));
     }
     $mpid = session('mpid');                        // 返回当前公众号标识
     if (empty($mpid)) {                             // 如果公众号标识不存在，则返回0
@@ -136,7 +136,7 @@ function get_mp_info($mpid = '') {
  * @author 艾逗笔<765532665@qq.com>
  */
 function get_openid($openid = '') {
-    $token = get_token();                     
+    $token = get_token();
     if (empty($token)) {                         // 如果公众号标识不存在
         return null;
     }
@@ -156,7 +156,7 @@ function get_openid($openid = '') {
  * 获取用户借权标识
  */
 function get_ext_openid($ext_openid = '') {
-    $token = get_token();                     
+    $token = get_token();
     if (empty($token)) {                         // 如果公众号标识不存在
         return null;
     }
@@ -214,7 +214,7 @@ function init_fans() {
                         $insert['headimgurl'] = $user_info['headimgurl'];
                         M('mp_fans')->add($insert);
                     }
-                } 
+                }
                 session('openid_'.$token, $result['openid']);        // 缓存用户标识
                 redirect($callback);                                 // 跳转回原来的地址
             }
@@ -232,9 +232,9 @@ function init_ext_fans() {
     $ext_appid = M('mp_setting')->where(array('mpid'=>get_mpid(),'name'=>'appid'))->getField('value');
     $ext_appsecret = M('mp_setting')->where(array('mpid'=>get_mpid(),'name'=>'appsecret'))->getField('value');
     if (empty($ext_openid) && is_wechat_browser() && $ext_appid && $ext_appsecret) {     // 通过网页授权拉取用户标识
-            $options = array(    
-                'appid'             =>  $ext_appid,               
-                'appsecret'         =>  $ext_appsecret            
+            $options = array(
+                'appid'             =>  $ext_appid,
+                'appsecret'         =>  $ext_appsecret
             );
             $wechatObj = new Wechat($options);
             if ($wechatObj->checkAuth($ext_appid, $ext_appsecret)) {              // 公众号有网页授权的权限
@@ -258,7 +258,7 @@ function init_ext_fans() {
                                 M('mp_fans')->where(array('mpid'=>get_mpid(),'openid'=>$openid))->save($update);
                             }
                         }
-                    } 
+                    }
                     session('ext_openid_'.$token, $result['openid']);        // 缓存用户标识
                     redirect($callback);                                 // 跳转回原来的地址
                 }
@@ -290,11 +290,11 @@ function get_jsapi_parameters($data) {
     $appsecret = M('mp_setting')->where(array('mpid'=>get_mpid(),'name'=>'appsecret'))->getField('value');
     $mchid = M('mp_setting')->where(array('mpid'=>get_mpid(),'name'=>'mchid'))->getField('value');
     $paysignkey = M('mp_setting')->where(array('mpid'=>get_mpid(),'name'=>'paysignkey'))->getField('value');
-    $jsApi = new JsApi_pub($appid,$mchid,$paysignkey,$appsecret); 
-    $orderid = $data['orderid'];      
+    $jsApi = new JsApi_pub($appid,$mchid,$paysignkey,$appsecret);
+    $orderid = $data['orderid'];
     if($orderid == ""){
         $orderid = $data['single_orderid'];
-    }   
+    }
     $price= floatval($data['price']);
     $data['mpid'] = get_mpid();
     unset($data['price']);
@@ -343,7 +343,7 @@ function mch_pay($params = array()) {
             $result['total_fee'] = $total_amount;
             $data['detail'] = json_encode($result);
             M('mp_payment')->add($data);
-        } 
+        }
     }
     unlink($sslcert);
     unlink($sslkey);
@@ -384,7 +384,7 @@ function redpack_pay($params = array()) {
             $result['total_fee'] = $total_amount;
             $data['detail'] = json_encode($result);
             M('mp_payment')->add($data);
-        } 
+        }
     }
     unlink($sslcert);
     unlink($sslkey);
@@ -461,7 +461,7 @@ function get_addon_entry($act, $addon = '', $mpid = '') {
         $addon_entry['url'] = U('Mobile/'.$addon_entry['act'].'@'.C('HTTP_HOST'), array('addon'=>$addon));
         $addon_entry['rule'] = D('MpRule')->get_entry_($addon_entry['id']);
     }
-    
+
     if (!isset($addon_entry)) {
         return false;
     }
@@ -536,10 +536,10 @@ function get_wechat_info($token = '') {
 function get_wechat_obj() {
     $wechatInfo = get_mp_info();
     $options = array(
-        'token'             =>  $wechatInfo['valid_token'],                 
-        'encodingaeskey'    =>  $wechatInfo['encodingaeskey'],      
-        'appid'             =>  $wechatInfo['appid'],               
-        'appsecret'         =>  $wechatInfo['appsecret']            
+        'token'             =>  $wechatInfo['valid_token'],
+        'encodingaeskey'    =>  $wechatInfo['encodingaeskey'],
+        'appid'             =>  $wechatInfo['appid'],
+        'appsecret'         =>  $wechatInfo['appsecret']
     );
     $wechatObj = new Wechat($options);
     $wechatObj->getRev();
@@ -577,7 +577,7 @@ function reply_music($arr) {
     }
     $wechatObj = get_wechat_obj();
     return $wechatObj->music($arr['title'], $arr['description'], $arr['musicurl'], $arr['hgmusicurl'], $arr['thumbmediaid'])->reply();
-} 
+}
 
 /**
  * 发送客服消息
@@ -746,7 +746,7 @@ function get_message($msgid) {
             break;
         case 'image':
             // 感谢 @  平凡<58000865@qq.com> 提供的微信图片防盗链解决方案
-            return '<img src="http://www.zorhand.com/img?url='.$message['picurl'].'" width="100" height="100" />';      
+            return '<img src="http://www.zorhand.com/img?url='.$message['picurl'].'" width="100" height="100" />';
             break;
         default:
             return '';
@@ -873,12 +873,12 @@ function execute_sql_file($sql_path) {
     $sql = file_get_contents($sql_path);
     $sql = str_replace("\r", "\n", $sql);
     $sql = explode(";\n", $sql);
-    
+
     // 替换表前缀
     $orginal = 'dc_';
     $prefix = C('DB_PREFIX');
     $sql = str_replace("{$orginal}", "{$prefix}", $sql);
-    
+
     // 开始安装
     foreach ($sql as $value) {
         $value = trim($value);
@@ -903,7 +903,7 @@ function pagination($count, $per = 10, $params = array()) {
     $Page = new \Think\Page($count, $per, $params);
     $Page->setConfig('rollPage', 7);
     $Page->setConfig('lastSuffix', false);
-    $Page->setConfig('page_begin_wrap', '<div class="page-control"><ul class="pagination pull-right">');    
+    $Page->setConfig('page_begin_wrap', '<div class="page-control"><ul class="pagination pull-right">');
     $Page->setConfig('page_end_wrap', '</ul></div>');
     $Page->setConfig('link_begin_wrap', '<li>');
     $Page->setConfig('link_end_wrap', '</li>');
@@ -911,8 +911,8 @@ function pagination($count, $per = 10, $params = array()) {
     $Page->setConfig('current_end_wrap', '</a></li>');
     $Page->setConfig('first', '<<');
     $Page->setConfig('last', '>>');
-    $Page->setConfig('prev', '<');  
-    $Page->setConfig('next', '>');  
+    $Page->setConfig('prev', '<');
+    $Page->setConfig('next', '>');
     $pagination = $Page->show();
     return $pagination;
 }
@@ -930,7 +930,7 @@ function get_addon() {
 }
 
 function get_agent() {
-    $agent = $_SERVER ['HTTP_USER_AGENT']; 
+    $agent = $_SERVER ['HTTP_USER_AGENT'];
     return $agent;
 }
 
@@ -951,7 +951,13 @@ function get_ip(){
     }
 }
 
-
+function r_cache()
+{
+    $redis = new \Redis();
+    $redis->connect(C('REDIS_HOST'), C('REDIS_PORT'));
+    $redis->select(1);
+    return $redis;
+}
 
 
 ?>
