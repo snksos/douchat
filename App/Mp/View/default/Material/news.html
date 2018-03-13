@@ -78,7 +78,7 @@
                                     <volist name="vo['news']" id="news">
                                         <if condition="$key==0">
                                             <div class="main_img">
-                                                <a href="{$news.url}" target="_blank"><img src="{$news.thumb_url|default=''}"></a>
+                                                <a href="{$news.url}" target="_blank"><img src="{$news.thumb_media_id|get_material_thumb}"></a>
                                             </div>
                                             <a href="{$news.url}" target="_blank" class="weui-desktop-appmsg__title">
                                                 <p class="desc ellipsis">{$news.title|default=''}</p>
